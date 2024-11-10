@@ -1,9 +1,14 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// Mesaj şeması
+// Message schema definition
 const messageSchema = new Schema({
   roomId: {
+    type: String,
+    required: true,
+    index: true,
+  },
+  username: {
     type: String,
     required: true,
   },
@@ -17,17 +22,20 @@ const messageSchema = new Schema({
   },
 });
 
-// Sanal 'id' alanı ekleyerek _id'yi id olarak döndür
+// Add a virtual 'id' field to return _id as 'id'
 messageSchema.virtual('id').get(function() {
   return this._id.toHexString();
 });
 
-// Bu sanal alanın de serialize edilmesi için
+// Ensure the virtual field 'id' is included when converting to JSON
 messageSchema.set('toJSON', {
   virtuals: true,
 });
 
-// Mesaj modelini oluştur
+// Create an index on timestamp for efficient querying by message time
+messageSchema.index({ timestamp: 1 });
+
+// Compile the Message model from the schema
 const Message = mongoose.model('Message', messageSchema);
 
 module.exports = Message;

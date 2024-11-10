@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-// Function to send messages to the API
-const sendMessageToAPI = async (roomId, message) => {
+// Function to send messages to the API with the username
+const sendMessageToAPI = async (roomId, message, username) => {
   try {
     const response = await axios.post('http://localhost:5000/api/messages/send', {  
       roomId,
       message,
+      username,  // Include username in the request
     });
     console.log('Message successfully sent to the API:', response.data);
   } catch (error) {
@@ -76,10 +77,10 @@ class WebSocketClient {
     this.onMessageCallback = onMessageCallback;
   }
 
-  sendMessage(roomId, message) {
+  sendMessage(roomId, message, username) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ roomId, message }));
-      sendMessageToAPI(roomId, message);
+      this.ws.send(JSON.stringify({ roomId, message, username }));  // Send username with the message
+      sendMessageToAPI(roomId, message, username);  // Also send to API
     } else {
       console.error('WebSocket connection is not open, retrying...');
       setTimeout(() => {

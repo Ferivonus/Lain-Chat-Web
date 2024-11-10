@@ -13,23 +13,25 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Create a new room
 router.post('/', async (req, res) => {
-    const { room_name } = req.body;
+    const { room_name, creator_username } = req.body;
 
-    // Check if room name is provided
+    // Check if room_name and creator_username are provided
     if (!room_name || room_name.trim() === '') {
         return res.status(400).send('Room name is required');
     }
+    if (!creator_username || creator_username.trim() === '') {
+        return res.status(400).send('Creator username is required');
+    }
 
     try {
-        const newRoom = new Room({ name: room_name });
+        const newRoom = new Room({ name: room_name, creator_username });
         await newRoom.save();
         res.status(201).json(newRoom); // Respond with the newly created room
     } catch (err) {
         res.status(500).send('Error creating room');
     }
 });
-
-// Optional: Add more routes for updating/deleting rooms as needed
 
 module.exports = router;
