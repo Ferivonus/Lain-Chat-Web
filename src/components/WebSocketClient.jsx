@@ -4,9 +4,9 @@ import axios from 'axios';
 const sendMessageToAPI = async (roomId, message, username) => {
   try {
     const response = await axios.post('http://localhost:5000/api/messages/send', {  
-      roomId,
-      message,
-      username,  // Include username in the request
+      roomId: roomId,
+      message: message,
+      username: username,  // Include username in the request
     });
     console.log('Message successfully sent to the API:', response.data);
   } catch (error) {

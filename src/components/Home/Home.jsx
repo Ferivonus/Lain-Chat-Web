@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { fetchRooms, createRoom } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const Home = () => {
     const [rooms, setRooms] = useState([]);
     const [newRoomName, setNewRoomName] = useState('');
-    const [creatorUsername, setCreatorUsername] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    // Çerezden creator username bilgisini alıyoruz
+    const creatorUsername = Cookies.get('username');
 
     useEffect(() => {
         const loadRooms = async () => {
@@ -22,10 +25,17 @@ const Home = () => {
     }, []);
 
     const handleCreateRoom = async () => {
-        if (!newRoomName.trim() || !creatorUsername.trim()) {
-            setError("Room name and creator username are required.");
+        if (!newRoomName.trim()) {
+            setError("Room name is required.");
             return;
         }
+
+        if (!creatorUsername) {
+            setError("Creator username is required. Please log in.");
+            return;
+        }
+        
+        console.log("Creating room with:", newRoomName, creatorUsername);
 
         try {
             const newRoom = await createRoom(newRoomName, creatorUsername);
@@ -36,7 +46,6 @@ const Home = () => {
                 createdAt: newRoom.createdAt
             }]);
             setNewRoomName('');
-            setCreatorUsername('');
             setError('');
         } catch (err) {
             setError("An error occurred while creating the room.");
@@ -56,7 +65,7 @@ const Home = () => {
                     <li key={room.id}>
                         <strong>Room Name:</strong> {room.name || "Unavailable"} <br />
                         <strong>Created by:</strong> {room.creator_username || "Unknown"} <br />
-                        <strong>Created At:</strong> {new Date(room.createdAt).toLocaleString()} {/* Display formatted date */}
+                        <strong>Created At:</strong> {new Date(room.createdAt).toLocaleString()}
                         <button onClick={() => handleEnterRoom(room.id)}>Enter Room</button>
                     </li>
                 ))}
@@ -66,12 +75,6 @@ const Home = () => {
                 value={newRoomName}
                 onChange={(e) => setNewRoomName(e.target.value)}
                 placeholder="New Room Name"
-            />
-            <input
-                type="text"
-                value={creatorUsername}
-                onChange={(e) => setCreatorUsername(e.target.value)}
-                placeholder="Creator Username"
             />
             <button onClick={handleCreateRoom}>Create Room</button>
         </div>

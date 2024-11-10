@@ -2,12 +2,12 @@
 import axios from 'axios';
 
 // API URL for your backend
-const API_URL = 'http://localhost:5000/api';  // Adjust this based on your backend URL
+const AUTH_API_URL = 'http://localhost:5000/api/auth';  // Adjust this based on your backend URL
 
 // Function to login a user
 export const loginUser = async (credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, credentials);
+    const response = await axios.post(`${AUTH_API_URL}/login`, credentials);
     return response.data; // Assuming it returns the logged-in user data
   } catch (error) {
     console.error('Error logging in:', error);
@@ -18,7 +18,7 @@ export const loginUser = async (credentials) => {
 // Function to register a new user
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/register`, userData);
+    const response = await axios.post(`${AUTH_API_URL}/register`, userData);
     return response.data; // Assuming it returns the newly created user data
   } catch (error) {
     console.error('Error registering:', error);
@@ -30,13 +30,16 @@ const ROOM_API_URL = 'http://localhost:5000/api/rooms';  // Adjust the URL if ne
 
 
 // Create a new room
-export const createRoom = async (roomName) => {
+export const createRoom = async (room_name, creator_username) => {
     try {
-        const response = await axios.post(ROOM_API_URL, { room_name: roomName });
-        return response.data; // This should return the newly created room
+        const response = await axios.post(ROOM_API_URL, {
+            room_name,
+            creator_username
+        });
+        return response.data;
     } catch (error) {
-        console.error("Error creating room:", error);
-        throw error; // Rethrow error to handle it in the component
+        console.error("Error creating room: ", error);
+        throw error;
     }
 };
 

@@ -15,7 +15,7 @@ const port = process.env.PORT || 5000;
 
 // CORS ayarları
 const corsOptions = {
-  origin: 'http://localhost:3000', // Adjust this according to your frontend URL
+  origin: 'http://localhost:3000', // frontend URL
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
