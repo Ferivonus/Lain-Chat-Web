@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const Home = () => {
     const [rooms, setRooms] = useState([]);
     const [newRoomName, setNewRoomName] = useState('');
-    const [creatorUsername, setCreatorUsername] = useState('');  // New state for creator username
+    const [creatorUsername, setCreatorUsername] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
@@ -13,26 +13,33 @@ const Home = () => {
         const loadRooms = async () => {
             try {
                 const data = await fetchRooms();
-                console.log("Rooms data:", data); // Log rooms data to verify the field names
                 setRooms(data);
             } catch (err) {
-                setError("Odalar yüklenirken bir hata oluştu.");
+                setError("An error occurred while loading rooms.");
             }
         };
         loadRooms();
     }, []);
 
     const handleCreateRoom = async () => {
-        if (newRoomName.trim() && creatorUsername.trim()) {
-            try {
-                const room = await createRoom(newRoomName, creatorUsername);  // Pass creatorUsername
-                console.log("Yeni oda yanıtı:", room);  // Log the response to confirm room creation
-                setRooms([...rooms, { ...room, id: room._id, name: room.name, creator_username: room.creator_username }]);  // Add new room
-                setNewRoomName('');
-                setCreatorUsername('');
-            } catch (err) {
-                setError("Oda oluşturulurken bir hata oluştu.");
-            }
+        if (!newRoomName.trim() || !creatorUsername.trim()) {
+            setError("Room name and creator username are required.");
+            return;
+        }
+
+        try {
+            const newRoom = await createRoom(newRoomName, creatorUsername);
+            setRooms((prevRooms) => [...prevRooms, { 
+                id: newRoom._id, 
+                name: newRoom.name, 
+                creator_username: newRoom.creator_username,
+                createdAt: newRoom.createdAt
+            }]);
+            setNewRoomName('');
+            setCreatorUsername('');
+            setError('');
+        } catch (err) {
+            setError("An error occurred while creating the room.");
         }
     };
 
@@ -42,14 +49,15 @@ const Home = () => {
 
     return (
         <div>
-            <h1>Odalar</h1>
+            <h1>Rooms</h1>
             {error && <div style={{ color: 'red' }}>{error}</div>}
             <ul>
                 {rooms.map((room) => (
                     <li key={room.id}>
-                        <strong>Room Name:</strong> {room.name || "Room Name Unavailable"} <br />
-                        <strong>Created by:</strong> {room.creator_username || "Unknown"} {/* Display creator's username */}
-                        <button onClick={() => handleEnterRoom(room.id)}>Giriş Yap</button>
+                        <strong>Room Name:</strong> {room.name || "Unavailable"} <br />
+                        <strong>Created by:</strong> {room.creator_username || "Unknown"} <br />
+                        <strong>Created At:</strong> {new Date(room.createdAt).toLocaleString()} {/* Display formatted date */}
+                        <button onClick={() => handleEnterRoom(room.id)}>Enter Room</button>
                     </li>
                 ))}
             </ul>
@@ -57,15 +65,15 @@ const Home = () => {
                 type="text"
                 value={newRoomName}
                 onChange={(e) => setNewRoomName(e.target.value)}
-                placeholder="Yeni oda adı"
+                placeholder="New Room Name"
             />
             <input
                 type="text"
                 value={creatorUsername}
                 onChange={(e) => setCreatorUsername(e.target.value)}
-                placeholder="Oluşturan kullanıcı adı"
+                placeholder="Creator Username"
             />
-            <button onClick={handleCreateRoom}>Oda Oluştur</button>
+            <button onClick={handleCreateRoom}>Create Room</button>
         </div>
     );
 };
