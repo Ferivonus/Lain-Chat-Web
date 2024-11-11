@@ -60,6 +60,7 @@ class WebSocketClient {
     this.ws.onmessage = (event) => {
       if (this.onMessageCallback) {
         this.onMessageCallback(event.data);
+        // edit here it's working when message sended
       }
     };
 
